@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 7.6.4.1 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		p { line-height: 115%; margin-bottom: 0.1in; background: transparent }
+		pre { background: transparent }
+		pre.western { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		pre.cjk { font-family: "NSimSun", monospace; font-size: 10pt }
+		pre.ctl { font-family: "Liberation Mono", monospace; font-size: 10pt }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre class="western">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;My Radio Player&lt;/title&gt;
+&lt;style&gt;
+body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+.station { padding: 10px; margin: 5px 0; background: #f0f0f0; cursor: pointer; }
+.station:hover { background: #e0e0e0; }
+.playing { background: #4CAF50; color: white; }
+#controls { margin: 20px 0; }
+button { padding: 8px 15px; margin-right: 10px; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;My Web Radio Player&lt;/h1&gt;
+&lt;div id=&quot;stations&quot;&gt;
+&lt;div class=&quot;station&quot; data-url=&quot;http://stream.radioparadise.com/rock-128&quot;&gt;Radio Paradise Rock&lt;/div&gt;
+&lt;div class=&quot;station&quot; data-url=&quot;http://icecast.thisisdax.com/ClassicFMMP3&quot;&gt;Classic FM&lt;/div&gt;
+&lt;div class=&quot;station&quot; data-url=&quot;http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio1_mf_q&quot;&gt;BBC Radio 1&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&quot;controls&quot;&gt;
+&lt;button id=&quot;playBtn&quot;&gt;Play&lt;/button&gt;
+&lt;button id=&quot;stopBtn&quot;&gt;Stop&lt;/button&gt;
+&lt;span id=&quot;nowPlaying&quot;&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div&gt;
+&lt;h3&gt;Add Custom Station&lt;/h3&gt;
+&lt;input type=&quot;text&quot; id=&quot;stationName&quot; placeholder=&quot;Station Name&quot;&gt;
+&lt;input type=&quot;text&quot; id=&quot;stationUrl&quot; placeholder=&quot;Stream URL&quot; style=&quot;width: 300px;&quot;&gt;
+&lt;button id=&quot;addBtn&quot;&gt;Add&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+let audioElement = new Audio();
+let currentStation = null;
+
+const stationsDiv = document.getElementById('stations');
+
+function playStation(url, name, element) {
+if (!url) return;
+if (!audioElement.paused) {
+audioElement.pause();
+}
+audioElement.src = url;
+audioElement.crossOrigin = &quot;anonymous&quot;;
+audioElement.play().catch(e =&gt; alert(&quot;Error playing stream: &quot; + e.message));
+currentStation = { url, name };
+document.getElementById('nowPlaying').textContent = `Now Playing: ${name}`;
+
+// Update UI
+document.querySelectorAll('.station').forEach(s =&gt; s.classList.remove('playing'));
+if (element) element.classList.add('playing');
+}
+
+function stopRadio() {
+audioElement.pause();
+audioElement.src = &quot;&quot;;
+currentStation = null;
+document.getElementById('nowPlaying').textContent = '';
+document.querySelectorAll('.station').forEach(s =&gt; s.classList.remove('playing'));
+}
+
+// Initialize existing stations
+document.querySelectorAll('.station').forEach(station =&gt; {
+station.addEventListener('click', () =&gt; {
+playStation(station.dataset.url, station.textContent, station);
+});
+});
+
+document.getElementById('playBtn').addEventListener('click', () =&gt; {
+if (currentStation) {
+playStation(currentStation.url, currentStation.name);
+} else {
+alert(&quot;Please select a station first.&quot;);
+}
+});
+
+document.getElementById('stopBtn').addEventListener('click', stopRadio);
+
+document.getElementById('addBtn').addEventListener('click', () =&gt; {
+const name = document.getElementById('stationName').value.trim();
+const url = document.getElementById('stationUrl').value.trim();
+
+if (!name || !url) {
+alert(&quot;Please enter both station name and URL&quot;);
+return;
+}
+
+const newStation = document.createElement('div');
+newStation.className = 'station';
+newStation.textContent = name;
+newStation.dataset.url = url;
+
+newStation.addEventListener('click', () =&gt; {
+playStation(url, name, newStation);
+});
+
+stationsDiv.appendChild(newStation);
+
+// Clear inputs
+document.getElementById('stationName').value = '';
+document.getElementById('stationUrl').value = '';
+});
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+</body>
+</html>
